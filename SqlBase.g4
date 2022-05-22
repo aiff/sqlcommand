@@ -107,9 +107,9 @@ singleTableSchema
 statement
     : query                                                            #statementDefault
     | ctes? dmlStatementNoWith                                         #dmlStatement
-    | COMPACT TABLE target=tableIdentifier partitionSpec?
-        (INTO fileNum=INTEGER_VALUE FILES)?                           #compactTable
     | USE NAMESPACE? multipartIdentifier                               #use
+    | COMPACT TABLE target=tableIdentifier partitionSpec?
+    (INTO fileNum=INTEGER_VALUE FILES)?                           #compactTable
     | CREATE namespace (IF NOT EXISTS)? multipartIdentifier
         (commentSpec |
          locationSpec |
@@ -1105,6 +1105,7 @@ ansiNonReserved
     | EXTENDED
     | EXTERNAL
     | EXTRACT
+    | FILES
     | FIELDS
     | FILEFORMAT
     | FIRST
@@ -1349,6 +1350,7 @@ nonReserved
     | FALSE
     | FETCH
     | FILTER
+    | FILES
     | FIELDS
     | FILEFORMAT
     | FIRST
@@ -1605,6 +1607,7 @@ FALSE: 'FALSE';
 FETCH: 'FETCH';
 FIELDS: 'FIELDS';
 FILTER: 'FILTER';
+FILES: 'FILES';
 FILEFORMAT: 'FILEFORMAT';
 FIRST: 'FIRST';
 FOLLOWING: 'FOLLOWING';
@@ -1894,3 +1897,4 @@ WS
 UNRECOGNIZED
     : .
     ;
+

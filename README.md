@@ -21,7 +21,12 @@ override def visitCompactTable(ctx: CompactTableContext): LogicalPlan = withOrig
     CompactTableCommand(table, fileNum)
   }
 
-4.
+# 4.放在src/main/scala/org/apache/spark/sql/execution/command
+case class CompactTableCommand(table: TableIdentifier,fileNum: Option[Int]) extends LeafRunnableCommand {
+override def output: Seq[Attribute] = Seq(AttributeReference("no_return", StringType, false)())
+override def run(spark: SparkSession): Seq[Row] = {
+
+ 
 val dataDF: DataFrame = spark.table(table)
 val num: Int = fileNum match {
   case Some(i) => i

@@ -11,17 +11,21 @@ COMPACT TABLE table_identify [partitionSpec] [INTO fileNum FILES]；
 
 
 
-````
-1.修改g4文件
-2.运行 Maven -> Spark Project Catalyst -> antlr4 -> antlr4:antlr4
-3.SparkSqlParser.scala 添加代码   /
+ 
+## 1.修改g4文件
+## 2.运行 Maven -> Spark Project Catalyst -> antlr4 -> antlr4:antlr4
+## 3.SparkSqlParser.scala 添加代码   
+```
+#  D:\spark-3.2.0\spark-3.2.0\sql\catalyst\target\generated-sources\antlr4\org\apache\spark\sql\catalyst\parser\SqlBaseParser.java
+/
 override def visitCompactTable(ctx: CompactTableContext): LogicalPlan = withOrigin(ctx) {
     val table: TableIdentifier = visitTableIdentifier(ctx.tableIdentifier())
     val fileNum: Option[Int] = ctx.INTEGER_VALUE().getText.toInt
     CompactTableCommand(table, fileNum)
   }
-
-# 4.放在src/main/scala/org/apache/spark/sql/execution/command
+```
+## 4.放在src/main/scala/org/apache/spark/sql/execution/command
+```
 case class CompactTableCommand(table: TableIdentifier,fileNum: Option[Int]) extends LeafRunnableCommand {
 override def output: Seq[Attribute] = Seq(AttributeReference("no_return", StringType, false)())
 override def run(spark: SparkSession): Seq[Row] = {

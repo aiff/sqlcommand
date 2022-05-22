@@ -106,6 +106,8 @@ singleTableSchema
 statement
     : query                                                            #statementDefault
     | ctes? dmlStatementNoWith                                         #dmlStatement
+    | COMPACT TABLE target=tableIdentifier partitionSpec?
+        (INTO fileNum=INTEGER_VALUE FILES)?                           #compactTable
     | USE NAMESPACE? multipartIdentifier                               #use
     | CREATE namespace (IF NOT EXISTS)? multipartIdentifier
         (commentSpec |

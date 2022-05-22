@@ -8,3 +8,37 @@ COMPACT TABLE table_identify [partitionSpec] [INTO fileNum FILES]；
 基本要求是完成以下功能：COMPACT TABLE test1 INTO 500 FILES；
 如果添加 partitionSpec，则只合并指定的 partition 目录的文件；
 如果不加 into fileNum files，则把表中的文件合并成 128MB 大小。
+
+
+
+````
+1.修改g4文件
+2.运行 Maven -> Spark Project Catalyst -> antlr4 -> antlr4:antlr4
+3.SparkSqlParser.scala 添加代码   /
+override def visitCompactTable(ctx: CompactTableContext): LogicalPlan = withOrigin(ctx) {
+    val table: TableIdentifier = visitTableIdentifier(ctx.tableIdentifier())
+    val fileNum: Option[Int] = ctx.INTEGER_VALUE().getText.toInt
+    CompactTableCommand(table, fileNum)
+  }
+
+4.
+val dataDF: DataFrame = spark.table(table)
+val num: Int = fileNum match {
+  case Some(i) => i
+  case _ =>
+    (spark
+      .sessionState
+      .executePlan(dataDF.queryExecution.logical)
+      .optimizedPlan
+      .stats.sizeInBytes / (1024L * 1024L * 128L)
+      ).toInt
+}
+log.warn(s"fileNum is $num")
+val tmpTableName = table.identifier+"_tmp"
+dataDF.write.mode(SaveMode.Overwrite).saveAsTable(tmpTableName)
+spark.table(tmpTableName).repartition(num).write.mode(SaveMode.Overwrite).saveAsTable(table.identifier)
+spark.sql(s"drop table if exists $tmpTableName")
+log.warn("Compacte Table Completed.")
+Seq()
+
+```
